@@ -12,8 +12,11 @@ public class SceneTransition : MonoBehaviour
     "LoadNextScene(SceneTransitionReference.NextScene, SceneTransitionReference.TransitionAnimation)")]
 
     public EndSceneTriggerS EndSceneTrigger; 
-    public enum TransitionAnimations {FadeToColour, FadeToImage, Dissolve, VerticalSwipe, HorizontalSwipe}
+    public enum TransitionAnimations {FadeToColour, FadeToImage, Dissolve, Swipe}
     public TransitionAnimations TransitionAnimation;
+    public enum SwipeDirection { Left, Right, Up, Down}
+    public SwipeDirection Direction;
+    public int SwipeSpeed;
     int ScenetoLoad;
     [SerializeField]
     public int NextScene;
@@ -55,14 +58,45 @@ public class SceneTransition : MonoBehaviour
                     
                 }
                 break;
-            case TransitionAnimations.VerticalSwipe:
+            case TransitionAnimations.Swipe:
                 {
-                    
-                }
-                break;
-            case TransitionAnimations.HorizontalSwipe:
-                {
-                    
+                    GameObject Panel = transform.GetChild(0).gameObject;
+                  //  Vector2 SwipeDir;
+                    Vector3 EndPos = Panel.transform.position;
+                    float Xoffset = Screen.width + Panel.transform.localScale.x;
+                    float Yoffset = Screen.height + Panel.transform.localScale.y;
+                    switch (Direction) 
+                    {
+                        
+                        case SwipeDirection.Left:
+                         {
+                                //SwipeDir = new Vector2(1, 0);                               
+                                Panel.transform.position = new Vector3(Panel.transform.position.x + Xoffset, Panel.transform.position.y, Panel.transform.position.z);
+                                SwipeScreen(Panel,EndPos);
+                         }
+                         break;
+                        case SwipeDirection.Right:
+                            {
+                                //SwipeDir = new Vector2(-1, 0);                              
+                                Panel.transform.position = new Vector3(Panel.transform.position.x - Xoffset, Panel.transform.position.y, Panel.transform.position.z);
+                                SwipeScreen(Panel,EndPos);
+                            }
+                          break;
+                         case SwipeDirection.Up:
+                         {
+                                // SwipeDir = new Vector2(0, -1);                               
+                                Panel.transform.position = new Vector3(Panel.transform.position.x, Panel.transform.position.y - Yoffset, Panel.transform.position.z);
+                                SwipeScreen(Panel,EndPos);
+                         }
+                         break;
+                        case SwipeDirection.Down:
+                            {
+                               // SwipeDir = new Vector2(0, 1);                                
+                                Panel.transform.position = new Vector3(Panel.transform.position.x, Panel.transform.position.y + Yoffset, Panel.transform.position.z);                               
+                                SwipeScreen(Panel,EndPos);
+                            }
+                         break;
+                    }
                 }
                 break;
         }
@@ -81,15 +115,12 @@ public class SceneTransition : MonoBehaviour
     {
 
     }
-    void VerticalSwipe()
-    {
-
+    void SwipeScreen(GameObject a, Vector3 b)
+    {        
+        TransitionScreen = a.GetComponent<CanvasGroup>();
+        TransitionScreen.alpha = 1;
+        StartCoroutine(Swipe(a,a.transform.position,b,SwipeSpeed));
     }
-    void HorizontalSwipe()
-    {
-
-    }
-
     public void ButtonClicked()
     {
         PlayTransitionAnimation(TransitionAnimation);
@@ -114,5 +145,22 @@ public class SceneTransition : MonoBehaviour
 
         }
         LoadNextScene();
+    }
+    public IEnumerator Swipe(GameObject PanelSLide, Vector2 start, Vector2 end, float lerpTime)
+    {
+        float _timeStartedLerping = Time.time;
+        float timeSinceStarted = Time.time - _timeStartedLerping;
+        float percentageComplete = timeSinceStarted / lerpTime;
+        while (true)
+        {
+            print("swiping");
+            timeSinceStarted = Time.time - _timeStartedLerping;
+            percentageComplete = timeSinceStarted / lerpTime;
+            PanelSLide.transform.position = Vector3.Lerp(start, end, percentageComplete);
+            if (percentageComplete >= 1)  break; 
+            yield return new WaitForFixedUpdate();
+        }
+        LoadNextScene();
+      
     }
 }
