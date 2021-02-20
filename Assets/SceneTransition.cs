@@ -160,7 +160,6 @@ public class SceneTransition : MonoBehaviour
             if (percentageComplete >= 1)  break; 
             yield return new WaitForFixedUpdate();
         }
-        LoadNextScene();
-      
+        LoadNextScene();      
     }
 }

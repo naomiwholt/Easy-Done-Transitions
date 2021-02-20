@@ -476,7 +476,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EndSceneTrigger: 1
   TransitionAnimation: 3
-  Direction: 2
+  Direction: 0
   SwipeSpeed: 2
   NextScene: 1
 --- !u!1 &403010023
